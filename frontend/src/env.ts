@@ -1,27 +1,17 @@
-import { createEnv } from '@t3-oss/env-core'
+import { createEnv } from '@t3-oss/env-nextjs'
 import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    DATABASE_URL: z.string().url(),
-    OPEN_AI_API_KEY: z.string().min(1)
+    NODE_ENV: z.string()
   },
-
-  /**
-   * The prefix that client-side variables must have. This is enforced both at
-   * a type-level and at runtime.
-   */
-  clientPrefix: 'NEXT_PUBLIC_',
-
   client: {
-    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1)
+    NEXT_PUBLIC_BACKEND_BASE_URL: z.string().min(1)
   },
-
-  /**
-   * What object holds the environment variables at runtime. This is usually
-   * `process.env` or `import.meta.env`.
-   */
-  runtimeEnv: process.env,
+  runtimeEnv: {
+    NODE_ENV: process.env.NODE_ENV,
+    NEXT_PUBLIC_BACKEND_BASE_URL: process.env.NEXT_PUBLIC_BACKEND_BASE_URL
+  },
 
   /**
    * By default, this library will feed the environment variables directly to
