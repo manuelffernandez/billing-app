@@ -1,6 +1,7 @@
+import { modelNames } from '@/utils/constants/model-names'
 import { Schema, model } from 'mongoose'
 
-interface IUser {
+export interface IUser {
   firstName: string
   lastName: string
   email: string
@@ -25,6 +26,6 @@ const userSchema = new Schema<IUser>({
   }
 })
 
-const UserModel = model<IUser>('User', userSchema)
+const UserModel = model<IUser>(modelNames.user, userSchema)
 
 export default UserModel

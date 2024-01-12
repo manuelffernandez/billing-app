@@ -1,7 +1,10 @@
+import { AdaptedUser } from '@/adapters/user'
+import { env } from '@/helpers/env'
 import { loginTokenGenerator } from '@/helpers/login-token-gen'
 import sendEmail from '@/helpers/mailer'
 import UserModel from '@/models/user'
 import { type Request, type Response } from 'express'
+import { sign } from 'jsonwebtoken'
 
 export const login = async (req: Request, res: Response) => {
   const { email } = req.params
@@ -11,12 +14,23 @@ export const login = async (req: Request, res: Response) => {
   if (!email) return res.status(400).json({ ok: false, message: 'No email was passed' })
   if (!loginToken) return res.status(400).json({ ok: false, message: 'No login token was passed' })
 
-  const user = await UserModel.findOne({ email, loginToken })
-  console.log('login controller', user)
+  try {
+    const user = await UserModel.findOne({ email, loginToken })
 
-  if (!user) return res.status(401).json({ ok: false, message: 'Invalid credentials' })
+    if (!user) return res.status(401).json({ ok: false, message: 'Invalid credentials' })
 
-  res.status(200).json({ ok: true, message: 'login successful' })
+    const adaptedUser = new AdaptedUser(user)
+    const token = sign({ sub: user._id }, env.JWT_PRIVATE_KEY, {
+      expiresIn: '1h',
+      header: { typ: 'JWT', alg: 'HS256' }
+    })
+
+    res.cookie('jwt', token, { httpOnly: true })
+    res.status(200).json(adaptedUser)
+  } catch (error) {
+    console.log('login controller error', error)
+    return res.status(500).json({ ok: false, message: 'Internal server error while login' })
+  }
 }
 
 export const sendLoginToken = async (req: Request, res: Response) => {

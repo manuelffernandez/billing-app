@@ -10,7 +10,8 @@ const envSchema = z.object({
   EMAIL: z.string().email(),
   EMAIL_PASSWORD: z.string(),
   SMTP_SERVER_HOST: z.string(),
-  SMTP_SERVER_PORT: z.number()
+  SMTP_SERVER_PORT: z.number(),
+  JWT_PRIVATE_KEY: z.string()
 })
 
 export const validateEnv = () => {
@@ -22,7 +23,8 @@ export const validateEnv = () => {
     EMAIL: process.env.EMAIL,
     EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
     SMTP_SERVER_HOST: process.env.SMTP_SERVER_HOST,
-    SMTP_SERVER_PORT: parseInt(process.env.SMTP_SERVER_PORT ?? '587')
+    SMTP_SERVER_PORT: parseInt(process.env.SMTP_SERVER_PORT ?? '587'),
+    JWT_PRIVATE_KEY: process.env.JWT_PRIVATE_KEY
   })
 
   return env
