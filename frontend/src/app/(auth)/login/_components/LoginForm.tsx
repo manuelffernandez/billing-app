@@ -1,6 +1,8 @@
 'use client'
 
 import { env } from '@/env'
+import { endpoints } from '@/utils/constants/endpoints'
+import { routes } from '@/utils/constants/routes'
 import {
   Button,
   ButtonGroup,
@@ -13,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -32,19 +35,26 @@ const LoginForm = () => {
     formState: { isSubmitting, errors },
     getValues
   } = useForm<FormValues>({
-    resolver: zodResolver(FormValuesSchema)
+    resolver: zodResolver(FormValuesSchema),
+    defaultValues: { email: 'manutest123456@gmail.com', loginToken: '602421' }
   })
+  const router = useRouter()
 
   const onSubmit = async (values: FormValues) => {
     const { email, loginToken } = values
     try {
-      const res = await axios.post(`${env.NEXT_PUBLIC_BACKEND_BASE_URL}/auth/login/${email}`, { loginToken })
-      console.log(res)
+      const res = await axios.post(
+        `${env.NEXT_PUBLIC_BACKEND_BASE_URL}${endpoints.login}/${email}`,
+        { loginToken },
+        { withCredentials: true }
+      )
+      console.log('nextauthRes', res)
+      router.push(routes.pages.dashboard)
     } catch (error) {
       console.log('login submit error', error)
     }
   }
-  console.log(errors)
+
   return (
     <Container marginTop={10}>
       <form onSubmit={handleSubmit(onSubmit)}>
